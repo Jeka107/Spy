@@ -1,49 +1,55 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class CardController : MonoBehaviour
 {
-    [SerializeField] private Vector3 cardRotate;
-    [SerializeField] private GameObject cardLayout;
-    [SerializeField] private GameObject cardBack;
+    public delegate void OnMovingDeck();
+    public static event OnMovingDeck onMovingDeck;
+
+    [SerializeField] private GameObject cardSides,cardBackText;
+    [SerializeField] private TextMeshProUGUI cardNumText;
     [SerializeField] private float smooth;
 
-    private bool cardBackIsActive=false;
+    private bool facedDown=true;
+    private Animator animatorCard,animatorCardSides;
+
+    private void Awake()
+    {
+        animatorCard = GetComponent<Animator>();
+        animatorCardSides = cardSides.GetComponent<Animator>();
+        cardBackText.SetActive(false);
+    }
 
     public void StartFlipCard()
     {
-        if (!cardBackIsActive)
-            StartCoroutine(FlipCard());
+        if (facedDown)
+        {
+            animatorCardSides.enabled = true;
+            animatorCardSides.Play("CardFlip");
+            facedDown = false;
+        }
         else
         {
-            //Activate animation.Card dispears from screen.
-            Debug.Log("Card dispears from screen");
-            Destroy(gameObject);
+            animatorCard.enabled = true;
+            animatorCard.Play("CardDisappear");
+
+            StartCoroutine(MoveDeck());
+            Destroy(gameObject, 0.5f);
         }
     }
-    IEnumerator FlipCard()
+    IEnumerator MoveDeck()
     {
-        int i = 0;
-
-        while(i!=180)
-        {
-            i++;
-
-            //rotate cards for smooth flip.
-            cardLayout.transform.Rotate(cardRotate);
-            cardBack.transform.Rotate(-cardRotate);
-
-            if (i == 90)
-                FlipStatus();
-
-            yield return new WaitForSeconds(smooth);
-        }
+        yield return new WaitForSeconds(0.1f);
+        onMovingDeck?.Invoke();
     }
-    private void FlipStatus()
+    public void SetCardLayoutText(int numOfCard)
     {
-        cardBack.SetActive(true);
-        cardBackIsActive = true;
+        cardNumText.text = numOfCard.ToString();
     }
-
+    public void ActivateCardBackText()
+    {
+        cardBackText.SetActive(true);
+    }
 }
