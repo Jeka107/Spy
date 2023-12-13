@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class CardController : MonoBehaviour
@@ -8,9 +9,18 @@ public class CardController : MonoBehaviour
     public delegate void OnMovingDeck();
     public static event OnMovingDeck onMovingDeck;
 
-    [SerializeField] private GameObject cardSides,cardBackText;
+    [SerializeField] private GameObject cardSides;
+
+    [Space]
+    [Header("Card Back")]
+    [SerializeField] private GameObject cardBackTextGO;
     [SerializeField] private TextMeshProUGUI cardNumText;
-    [SerializeField] private float smooth;
+
+    [Space]
+    [Header("Card Face")]
+    [SerializeField] private Image imageCardFace;
+    [SerializeField] private Sprite cardSpySprite;
+    [SerializeField] private TextMeshProUGUI cardFaceText;
 
     private bool facedDown=true;
     private Animator animatorCard,animatorCardSides;
@@ -19,7 +29,7 @@ public class CardController : MonoBehaviour
     {
         animatorCard = GetComponent<Animator>();
         animatorCardSides = cardSides.GetComponent<Animator>();
-        cardBackText.SetActive(false);
+        cardBackTextGO.SetActive(false);
     }
 
     public void StartFlipCard()
@@ -44,12 +54,21 @@ public class CardController : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         onMovingDeck?.Invoke();
     }
-    public void SetCardLayoutText(int numOfCard)
+    public void SetCardBackText(int numOfCard)
     {
         cardNumText.text = numOfCard.ToString();
     }
     public void ActivateCardBackText()
     {
-        cardBackText.SetActive(true);
+        cardBackTextGO.SetActive(true);
+    }
+    public void SetCardFace(string word)
+    {
+        cardFaceText.text = word;
+    }
+    public void SetSpyCard()
+    {
+        imageCardFace.sprite = cardSpySprite;
+        cardFaceText.text = "מרגל";
     }
 }

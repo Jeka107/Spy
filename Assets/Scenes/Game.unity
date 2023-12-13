@@ -309,7 +309,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1288850628}
+  - {fileID: 1345291277}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -385,12 +385,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!224 &1288850628 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 3140953631504298432, guid: 273dd984829122a4ab9ffa3c1c76de6d, type: 3}
-  m_PrefabInstance: {fileID: 324108166573695965}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &324108166573695965
+--- !u!1001 &1345291276
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -491,6 +486,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 273dd984829122a4ab9ffa3c1c76de6d, type: 3}
+--- !u!224 &1345291277 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3140953631504298432, guid: 273dd984829122a4ab9ffa3c1c76de6d, type: 3}
+  m_PrefabInstance: {fileID: 1345291276}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3497246859495024285
 GameObject:
   m_ObjectHideFlags: 0
@@ -523,6 +523,7 @@ MonoBehaviour:
   canvas: {fileID: 1243024519}
   card: {fileID: 655657282802185875, guid: 273dd984829122a4ab9ffa3c1c76de6d, type: 3}
   numOfCards: 10
+  numOfSpyes: 0
   distance: 15
   movementSpeed: 50
   speedDeck: 0.05

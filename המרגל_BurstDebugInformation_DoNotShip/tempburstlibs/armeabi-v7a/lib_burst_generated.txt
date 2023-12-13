@@ -18,6 +18,7 @@ Library: C:\UnityProjectGit\Spy\Temp\BurstOutput\tempburstlibs\armeabi-v7a\lib_b
 --assembly-defines=Unity.InternalAPIEngineBridge.001;
 --assembly-defines=Unity.2D.Common.Runtime;
 --assembly-defines=Unity.Timeline;
+--assembly-defines=RTLTMPro;
 --assembly-defines=Unity.Collections;
 --assembly-defines=Unity.2D.SpriteShape.Runtime;
 --assembly-defines=Unity.2D.PixelPerfect;

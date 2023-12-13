@@ -4,46 +4,81 @@ using UnityEngine;
 
 public class CardsManager : MonoBehaviour
 {
+    public delegate int OnGetNumberOfPlayers();
+    public static event OnGetNumberOfPlayers onGetNumberOfPlayers;
+    public delegate int OnGetNumberOfSpyes();
+    public static event OnGetNumberOfSpyes onGetNumberOfSpyes;
+    public delegate int OnGetTimer();
+    public static event OnGetTimer onGetTimer;
+    public delegate string OnGetWord();
+    public static event OnGetWord onGetWord;
+
     [SerializeField] private GameObject canvas;
     [SerializeField] private GameObject card;
-    [SerializeField] private int numOfCards;
+    [SerializeField] private int numOfCards=0;
+    [SerializeField] private int numOfSpyes=0;
+    [SerializeField] private int timer = 0;
+    [SerializeField] private string word;
     [SerializeField] private int distance;
     [SerializeField] private float movementSpeed;
     [SerializeField] private float speedDeck;
+    [SerializeField] private List<GameObject> deckOfCard = new List<GameObject>();
 
     private GameObject currentCard;
     private CardController cardController;
-    [SerializeField] private List<GameObject> deckOfCard=new List<GameObject>();
     private Vector3 currentCardPos=Vector3.zero;
+    private List<int> listNumbers = new List<int>();
 
     private void Awake()
     {
-        //currentCardPos = transform.position;
+        numOfCards = onGetNumberOfPlayers.Invoke();
+        numOfSpyes = onGetNumberOfSpyes.Invoke();
+        timer = onGetTimer.Invoke();
+        word = onGetWord.Invoke();
+        CreateListNumbers();
         CreateCards();
-
         CardController.onMovingDeck += StartMoveDeckOfCards;
     }
     private void OnDestroy()
     {
         CardController.onMovingDeck -= StartMoveDeckOfCards;
     }
+    private void CreateListNumbers()
+    {
+        for(int i=0;i<numOfCards;i++)
+        {
+            listNumbers.Add(i);
+        }
+    }
     private void CreateCards()
     {
-        for (int i = numOfCards; i > 0; i--)
+        for (int i = numOfCards-1; i >= 0; i--)
         {
             currentCardPos = new Vector3(-i * distance, -i* distance, 0);
             currentCard = Instantiate(card, currentCardPos, Quaternion.identity, transform);
             cardController = currentCard.GetComponent<CardController>();
             deckOfCard.Add(currentCard);
 
-            if (i==1)
+            if (i==0)
             {
                 cardController.ActivateCardBackText();
             }
 
-            cardController.SetCardLayoutText(i);
+            cardController.SetCardBackText(i+1);
+            cardController.SetCardFace(word);
         }
         transform.SetParent(canvas.transform, false);
+        RandmSpyes();
+    }
+    private void RandmSpyes()
+    {
+        for(int i=0;i< numOfSpyes;i++)
+        {
+            int rand = Random.Range(0, listNumbers.Count);
+
+            deckOfCard[listNumbers[rand]].GetComponent<CardController>().SetSpyCard();
+            listNumbers.RemoveAt(rand);
+        }
     }
     private void StartMoveDeckOfCards()
     {
