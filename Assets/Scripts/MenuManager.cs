@@ -48,6 +48,11 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject spyesScroolView;
     [SerializeField] private GameObject timeScroolView;
 
+    [Space]
+    [Header("UI Managment(Third Screen)")]
+    [SerializeField] private GameObject deletePack;
+
+    private GameObject currentGameObject;
     private GameObject currentNameInPack;
     private string currentPackName;
 
@@ -62,6 +67,7 @@ public class MenuManager : MonoBehaviour
 
         TextFileStorage.onSelected += SubjectSelected;
         NewPack.onSelected += SubjectSelected;
+        NewPack.onSelectedCustomPack += CustomSubjectSelected;
         NewPack.onDefaultPack += DefaultPack;
         SnapToSlot.onSnapNumberOfPlayers += SetNumberOfPlayers;
         SnapToSlot.onSnapNumberOfSpyes += SetNumberOfSpyes;
@@ -83,6 +89,7 @@ public class MenuManager : MonoBehaviour
 
         TextFileStorage.onSelected -= SubjectSelected;
         NewPack.onSelected -= SubjectSelected;
+        NewPack.onSelectedCustomPack -= CustomSubjectSelected;
         NewPack.onDefaultPack -= DefaultPack;
         SnapToSlot.onSnapNumberOfPlayers -= SetNumberOfPlayers;
         SnapToSlot.onSnapNumberOfSpyes -= SetNumberOfSpyes;
@@ -181,6 +188,19 @@ public class MenuManager : MonoBehaviour
 
         namesScroolView.SetActive(true);
         subjScroolView.SetActive(false);
+    }
+    private void CustomSubjectSelected(GameObject pack)
+    {
+        currentGameObject = pack;
+        deletePack.SetActive(true);
+    }
+    public void CustomSubjectDelete()
+    {
+        currentGameObject.GetComponent<NewPack>().DeleteThisPack();
+
+        namesScroolView.SetActive(false);
+        subjScroolView.SetActive(true);
+        deletePack.SetActive(false);
     }
     public void SubjectSelectionOn()
     {

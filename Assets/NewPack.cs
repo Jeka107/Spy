@@ -18,54 +18,22 @@ public class NewPack : MonoBehaviour
     public static event OnDefaultPack onDefaultPack;
     public delegate void OnSelected(List<PackData> pack, string textfileName);
     public static event OnSelected onSelected;
+    public delegate void OnSelectedCustomPack(GameObject gameObject);
+    public static event OnSelectedCustomPack onSelectedCustomPack;
 
     [SerializeField] private GameObject newPackText;
-    [SerializeField] private GameObject deletePackButton;
     [SerializeField] private TextMeshProUGUI packName;
-    [SerializeField] private GameObject confirmDelete;
-    [SerializeField] private float holdTime;
-    [SerializeField] private Animator animator;
 
     private List<PackData> pack = new List<PackData>();
-    private bool hold = false;
     private void Start()
     {
-        deletePackButton.SetActive(false);
-        confirmDelete.SetActive(false);
         pack = onLoadPack?.Invoke(packName.text);  
     }
-    public void HoldStart()
-    {
-        StartCoroutine(Hold());
-    }
-    IEnumerator Hold()
-    {
-        yield return new WaitForSeconds(holdTime);
-        animator.SetBool("Size", true);
-        newPackText.SetActive(false);
-        deletePackButton.SetActive(true);
-        hold = true;
-    }
-    public void CancelDelete()
-    {
-        confirmDelete.SetActive(false);
-        animator.SetBool("Size", false);
-        newPackText.SetActive(true);
-        deletePackButton.SetActive(false);
-        hold = false;
-    }
-    public void ConfirmDeleteLabelOn()
-    {
-        confirmDelete.SetActive(true);
-    }
-    public void ConfirmDeleteLabelOff()
-    {
-        CancelDelete();
-    }
+
     public void Selected()
     {
-        if(!hold)
-            onSelected?.Invoke(pack, packName.text);
+        onSelected?.Invoke(pack, packName.text);
+        onSelectedCustomPack?.Invoke(this.gameObject);
     }
     public void SetPackName(string _packName)
     {
