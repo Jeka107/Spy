@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
+    public delegate void OnNamesEmpty(bool status);
+    public static event OnNamesEmpty onNamesEmpty;
+
     [SerializeField] private int numberOfPlayers;
     [SerializeField] private int numberOfSpyes;
     [SerializeField] private int timer;
     [SerializeField] private List<PackData> pack;
 
     private static bool created = false;
-    [SerializeField] private List<string> names=new List<string>();
+    private List<string> names=new List<string>();
     private string randomWord;
     private void Awake()
     {
@@ -38,6 +41,8 @@ public class DataManager : MonoBehaviour
     }
     private void SetGame(SavedData savedData)
     {
+        names.Clear();
+
         numberOfPlayers = savedData.players;
         numberOfSpyes = savedData.spyes;
         timer = savedData.time;
@@ -54,6 +59,11 @@ public class DataManager : MonoBehaviour
             int rand = Random.Range(0, names.Count - 1);
             randomWord = names[rand];
         }
+        if (names.Count == 0)
+            onNamesEmpty?.Invoke(false);
+        else
+            onNamesEmpty?.Invoke(true);
+
     }
     private int GetNumberOfPlayers()
     {

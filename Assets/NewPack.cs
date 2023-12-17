@@ -16,7 +16,7 @@ public class NewPack : MonoBehaviour
     public static event OnDeleteThisPack onDeleteThisPack;
     public delegate void OnDefaultPack();
     public static event OnDefaultPack onDefaultPack;
-    public delegate void OnSelected(List<PackData> pack, string textfileName);
+    public delegate void OnSelected(List<PackData> pack, string textfileName,PackType typePack);
     public static event OnSelected onSelected;
     public delegate void OnSelectedCustomPack(GameObject gameObject);
     public static event OnSelectedCustomPack onSelectedCustomPack;
@@ -32,7 +32,7 @@ public class NewPack : MonoBehaviour
 
     public void Selected()
     {
-        onSelected?.Invoke(pack, packName.text);
+        onSelected?.Invoke(pack, packName.text,PackType.Custom);
         onSelectedCustomPack?.Invoke(this.gameObject);
     }
     public void SetPackName(string _packName)

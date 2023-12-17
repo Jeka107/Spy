@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TextFileStorage : MonoBehaviour
 {
-    public delegate void OnSelected(List<PackData> pack,string textfileName);
+    public delegate void OnSelected(List<PackData> pack, string textfileName, PackType typePack);
     public static event OnSelected onSelected;
 
     public delegate List<PackData> OnAwake(TextAsset textFile,string textfileName);
@@ -26,7 +26,7 @@ public class TextFileStorage : MonoBehaviour
     }
     public void Selected()
     {
-        onSelected?.Invoke(pack, textfileName);
+        onSelected?.Invoke(pack, textfileName,PackType.Default);
     }
     public List<PackData> GetPack()
     {

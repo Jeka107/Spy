@@ -23,7 +23,7 @@ public class CardsManager : MonoBehaviour
     [SerializeField] private float movementSpeed;
     [SerializeField] private float speedDeck;
     [SerializeField] private List<GameObject> deckOfCard = new List<GameObject>();
-
+    [SerializeField] private List<int> spyesPlaces = new List<int>();
     private GameObject currentCard;
     private CardController cardController;
     private Vector3 currentCardPos=Vector3.zero;
@@ -75,6 +75,7 @@ public class CardsManager : MonoBehaviour
         for(int i=0;i< numOfSpyes;i++)
         {
             int rand = Random.Range(0, listNumbers.Count);
+            spyesPlaces.Add(rand);//to show who the spyes.
 
             deckOfCard[listNumbers[rand]].GetComponent<CardController>().SetSpyCard();
             listNumbers.RemoveAt(rand);

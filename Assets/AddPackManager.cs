@@ -27,6 +27,7 @@ public class AddPackManager : MonoBehaviour
         {
             currentNewPack = Instantiate(newPack, transform.position, Quaternion.identity, packsContent.transform);
             currentNewPack.GetComponent<NewPack>().SetPackName(inputField.text);
+            inputField.text = "";
         }
     }
     private void AddPack(string packName)

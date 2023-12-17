@@ -4,6 +4,11 @@
     NumberOfSpyes,
     Time
 }
+public enum PackType
+{
+    Default,
+    Custom
+}
 public static class EnumTitle
 {
     public const string
@@ -13,3 +18,4 @@ public static class EnumTitle
         Time = "שעון עצר";
 
 }
+

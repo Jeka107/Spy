@@ -50,17 +50,28 @@ public class MenuManager : MonoBehaviour
 
     [Space]
     [Header("UI Managment(Third Screen)")]
-    [SerializeField] private GameObject deletePack;
+    [SerializeField] private TextMeshProUGUI thirdScreenTitle;
+    [SerializeField] private GameObject blur;
+    [SerializeField] private GameObject deletePackIcon;
+    [SerializeField] private GameObject confirmDeletePackLabel;
+    [SerializeField] private GameObject confirmDeleteNameLabel;
 
+
+    private bool gameStatus;
     private GameObject currentGameObject;
     private GameObject currentNameInPack;
+    private List<PackData> currentPack = new List<PackData>();
     private string currentPackName;
+    private int currentNameInPackPos;
 
     private SavedData currentSavedData=new SavedData();
+
+    private Animator blurAnimator;
 
     private void Awake()
     {
         namesScroolView.SetActive(false);
+        blurAnimator = blur.GetComponent<Animator>();
 
         //first time playing
         SaveDataManager.onFirstTimePack += SetFirstTimeGame;
@@ -73,6 +84,9 @@ public class MenuManager : MonoBehaviour
         SnapToSlot.onSnapNumberOfSpyes += SetNumberOfSpyes;
         SnapToSlot.onSnapTime += SetTimeSelected;
         NameInPack.onToggleChange += ToggleChange;
+        NameInPack.onDelete += ConfirmDeleteNameLabelOn;
+
+        DataManager.onNamesEmpty += SetGameStatus;
     }
     private void Start()
     {
@@ -95,18 +109,25 @@ public class MenuManager : MonoBehaviour
         SnapToSlot.onSnapNumberOfSpyes -= SetNumberOfSpyes;
         SnapToSlot.onSnapTime -= SetTimeSelected;
         NameInPack.onToggleChange -= ToggleChange;
+        NameInPack.onDelete -= ConfirmDeleteNameLabelOn;
+
+        DataManager.onNamesEmpty -= SetGameStatus;
     }
 
     private void SetFirstTimeGame(SavedData savedData)
     {
         currentSavedData = savedData;
     }
+    private void SetGameStatus(bool status)
+    {
+        gameStatus = status;
+    }
 
     #region SceneManagement
     public void LoadNextScene()
     {
-        onSetGame?.Invoke(currentSavedData);
-        StartCoroutine(Load());
+        if(gameStatus)
+            StartCoroutine(Load());
     }
     IEnumerator Load()
     {
@@ -123,13 +144,16 @@ public class MenuManager : MonoBehaviour
         currentSavedData.packName = currentContentChild.GetPackName();
 
         SetSavedDataUI(currentSavedData);
+        StartCoroutine(ClearThirdScreen(0));
     }
     private void SetSavedDataUI(SavedData _savedData)
     {
         numberOfPlayersText.text = _savedData.players.ToString();
         numberOfSpyesText.text = _savedData.spyes.ToString();
         timeSelected.text = _savedData.time.ToString();
-        subjectText.text = _savedData.packName; 
+        subjectText.text = _savedData.packName;
+
+        onSetGame?.Invoke(currentSavedData);
     }
     public void NumberOfPlayersOn()
     {
@@ -172,38 +196,107 @@ public class MenuManager : MonoBehaviour
     {
         currentSavedData.time = num;
     }
-    public void SubjectSelected(List<PackData> pack,string packName)
+    
+
+    #region Custom Subject
+    private void CustomSubjectSelected(GameObject pack)
+    {
+        currentGameObject = pack;
+        deletePackIcon.SetActive(true);
+    }
+    public void CustomSubjectConfirmDelete()
+    {
+        confirmDeletePackLabel.SetActive(true);
+        blurAnimator.SetBool("Screen", true);
+    }
+    public void CustomSubjectCancelDelete()
+    {
+        confirmDeletePackLabel.SetActive(false);
+        blurAnimator.SetBool("Screen", false);
+    }
+    public void CustomSubjectDelete()
+    {
+        currentGameObject.GetComponent<NewPack>().DeleteThisPack();
+        blurAnimator.SetBool("Screen", false);
+
+        namesScroolView.SetActive(false);
+        subjScroolView.SetActive(true);
+        deletePackIcon.SetActive(false);
+        confirmDeletePackLabel.SetActive(false);
+    }
+    #endregion
+
+    #region Custom Name
+    private void ToggleChange(int namePlace, bool status)
+    {
+        currentPack[namePlace].status = status;
+        onPackChange?.Invoke(currentPack, currentPackName);
+    }
+    public void AddCustomWord(TMP_InputField inputField)
     {
         NameInPack nameInPack;
-        currentSavedData.pack = pack;
+
+        if (inputField.text != "")
+        {
+            currentPack.Add(new PackData(inputField.text, true));
+            onPackChange?.Invoke(currentPack, currentPackName);
+
+            currentNameInPack = Instantiate(nameOfPrefab, transform.position, Quaternion.identity, namesScroolViewContent.transform);
+            nameInPack = currentNameInPack.GetComponent<NameInPack>();
+
+            nameInPack.SetGameObject(inputField.text, true);
+            inputField.text = "";
+        }
+    }
+    private void ConfirmDeleteNameLabelOn(int _currentNameInPackPos, GameObject _currentNameInPack)
+    {
+        currentNameInPack = _currentNameInPack;
+        currentNameInPackPos = _currentNameInPackPos;
+
+        confirmDeleteNameLabel.SetActive(true);
+        blurAnimator.SetBool("Screen", true);
+    }
+    public void ConfirmDeleteNameLabelOff()
+    {
+        confirmDeleteNameLabel.SetActive(false);
+        blurAnimator.SetBool("Screen", false);
+    }
+    public void ConfirmDeleteName()
+    {
+        currentPack.RemoveAt(currentNameInPackPos);
+        Destroy(currentNameInPack);
+        ConfirmDeleteNameLabelOff();
+
+        onPackChange?.Invoke(currentPack, currentPackName);
+    }
+    #endregion
+
+    public void SubjectSelected(List<PackData> pack, string packName,PackType packType)
+    {
+        NameInPack nameInPack;
+
+        currentPack = pack;
         currentPackName = packName;
+        thirdScreenTitle.text = currentPackName;
 
         for (int i = 0; i < pack.Count; i++)
         {
             currentNameInPack = Instantiate(nameOfPrefab, transform.position, Quaternion.identity, namesScroolViewContent.transform);
             nameInPack = currentNameInPack.GetComponent<NameInPack>();
 
-            nameInPack.SetGameObject(i,pack[i].name, pack[i].status);
+            nameInPack.SetGameObject(i, pack[i].name, pack[i].status);
+            nameInPack.ToggleOn();
+
+            if (packType == PackType.Default)
+                nameInPack.DisableDelete();
         }
 
         namesScroolView.SetActive(true);
         subjScroolView.SetActive(false);
     }
-    private void CustomSubjectSelected(GameObject pack)
-    {
-        currentGameObject = pack;
-        deletePack.SetActive(true);
-    }
-    public void CustomSubjectDelete()
-    {
-        currentGameObject.GetComponent<NewPack>().DeleteThisPack();
-
-        namesScroolView.SetActive(false);
-        subjScroolView.SetActive(true);
-        deletePack.SetActive(false);
-    }
     public void SubjectSelectionOn()
     {
+        deletePackIcon.SetActive(false);
         StartCoroutine(ClearThirdScreen(0f));
     }
     public void ConfirmedNumberSelection()
@@ -217,6 +310,7 @@ public class MenuManager : MonoBehaviour
     }
     public void ConfirmedSubjectSelection()
     {
+        currentSavedData.pack = currentPack;
         currentSavedData.packName = currentPackName;
         onPackChange?.Invoke(currentSavedData.pack, currentSavedData.packName);
         SetSavedDataUI(currentSavedData);
@@ -238,26 +332,13 @@ public class MenuManager : MonoBehaviour
         }
         namesScroolView.SetActive(false);
         subjScroolView.SetActive(true);
+        thirdScreenTitle.text = "נושאים";
     } 
     public void ScreensOff()
     {
         onSecondScreenOff?.Invoke();
         ThirdsScreenOff();
     }
-    private void ToggleChange(int namePlace,bool status)
-    {
-        currentSavedData.pack[namePlace].status = status;
-    }
-    public void AddCustomWord(TMP_InputField inputField)
-    {
-        NameInPack nameInPack;
-        currentSavedData.pack.Add(new PackData(inputField.text, true));
-        onPackChange?.Invoke(currentSavedData.pack, currentPackName);
-
-        currentNameInPack = Instantiate(nameOfPrefab, transform.position, Quaternion.identity, namesScroolViewContent.transform);
-        nameInPack = currentNameInPack.GetComponent<NameInPack>();
-
-        nameInPack.SetGameObject(inputField.text, true);
-    }
+    
     #endregion
 }
