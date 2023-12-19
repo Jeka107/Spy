@@ -7,48 +7,46 @@ public class ScreenManager : MonoBehaviour
     [SerializeField] private GameObject menuScreen;
     [SerializeField] private GameObject secondScreen;
     [SerializeField] private GameObject thirdScreen;
+    [SerializeField] private GameObject howToPlayScreen;
     [SerializeField] private GameObject blur;
 
     private Animator secondScreenAnimator;
     private Animator thirdScreenAnimator;
+    private Animator howToPlayScreenAnimator;
     private Animator blurAnimator;
 
     private void Awake()
     {
         secondScreenAnimator = secondScreen.GetComponent<Animator>();
-        thirdScreenAnimator=thirdScreen.GetComponent<Animator>();
+        thirdScreenAnimator = thirdScreen.GetComponent<Animator>();
+        howToPlayScreenAnimator = howToPlayScreen.GetComponent<Animator>();
         blurAnimator = blur.GetComponent<Animator>();
 
-        MenuManager.onSecondScreenOn += SecondScreenOn;
-        MenuManager.onSecondScreenOff += SecondScreenOff;
-        MenuManager.onThirdScreenOn += ThirdScreenOn;
-        MenuManager.onThirdScreenOff += ThirdScreenOff;
+        MenuManager.onSecondScreen += SecondScreenAction;
+        MenuManager.onThirdScreen += ThirdScreenAction;
+        MenuManager.onHowToPlayScreen += howToPlayScreenAction;
     }
     private void OnDestroy()
     {
-        MenuManager.onSecondScreenOn -= SecondScreenOn;
-        MenuManager.onSecondScreenOff -= SecondScreenOff;
-        MenuManager.onThirdScreenOn -= ThirdScreenOn;
-        MenuManager.onThirdScreenOff -= ThirdScreenOff;
+        MenuManager.onSecondScreen -= SecondScreenAction;
+        MenuManager.onThirdScreen -= ThirdScreenAction;
+        MenuManager.onHowToPlayScreen -= howToPlayScreenAction;
     }
-    private void SecondScreenOn()
+    private void SecondScreenAction(bool status)
     {
-        secondScreenAnimator.SetBool("Screen", true);
-        blurAnimator.SetBool("Screen", true);
+        secondScreenAnimator.SetBool("Screen", status);
+        blurAnimator.SetBool("Screen", status);
     }
-    private void SecondScreenOff()
+
+    private void ThirdScreenAction(bool status)
     {
-        secondScreenAnimator.SetBool("Screen", false);
-        blurAnimator.SetBool("Screen", false);
+        thirdScreenAnimator.SetBool("Screen", status);
+        blurAnimator.SetBool("Screen", status);
     }
-    private void ThirdScreenOn()
+
+    private void howToPlayScreenAction(bool status)
     {
-        thirdScreenAnimator.SetBool("Screen", true);
-        blurAnimator.SetBool("Screen", true);
-    }
-    private void ThirdScreenOff()
-    {
-        thirdScreenAnimator.SetBool("Screen", false);
-        blurAnimator.SetBool("Screen", false);
+        howToPlayScreenAnimator.SetBool("Screen", status);
+        blurAnimator.SetBool("Screen", status);
     }
 }

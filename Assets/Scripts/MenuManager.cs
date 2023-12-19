@@ -2,21 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System;
 using TMPro;
 
 public class MenuManager : MonoBehaviour
 {
     // Events Managment
-    public delegate void OnSecondScreenOn();
-    public static event OnSecondScreenOn onSecondScreenOn;
-    public delegate void OnSecondScreenOff();
-    public static event OnSecondScreenOff onSecondScreenOff;
-    public delegate void OnThirdScreenOn();
-    public static event OnThirdScreenOn onThirdScreenOn;
-    public delegate void OnThirdScreenOff();
-    public static event OnThirdScreenOff onThirdScreenOff;
-    
+    public delegate void OnSecondScreen(bool status);
+    public static event OnSecondScreen onSecondScreen;
+    public delegate void OnThirdScreen(bool status);
+    public static event OnThirdScreen onThirdScreen;
+    public delegate void OnHowToPlayScreen(bool status);
+    public static event OnHowToPlayScreen onHowToPlayScreen;
+
     public delegate SavedData OnLoadSavedDataToUI();
     public static event OnLoadSavedDataToUI onLoadSavedDataToUI;
     public delegate void OnSetGame(SavedData savedData);
@@ -39,7 +36,9 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timeSelected;
     [SerializeField] private TextMeshProUGUI subjectText;
     [SerializeField] private GameObject nameOfPrefab;
+    [SerializeField] private GameObject packEmptyError;
     [SerializeField] private string[] names;
+    
 
     [Space]
     [Header("UI Managment(Second Screen)")]
@@ -56,11 +55,9 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject confirmDeletePackLabel;
     [SerializeField] private GameObject confirmDeleteNameLabel;
 
-
-    private bool gameStatus;
     private GameObject currentGameObject;
     private GameObject currentNameInPack;
-    private List<PackData> currentPack = new List<PackData>();
+    private List<PackData> currentPacks = new List<PackData>();
     private string currentPackName;
     private int currentNameInPackPos;
 
@@ -85,8 +82,6 @@ public class MenuManager : MonoBehaviour
         SnapToSlot.onSnapTime += SetTimeSelected;
         NameInPack.onToggleChange += ToggleChange;
         NameInPack.onDelete += ConfirmDeleteNameLabelOn;
-
-        DataManager.onNamesEmpty += SetGameStatus;
     }
     private void Start()
     {
@@ -110,24 +105,16 @@ public class MenuManager : MonoBehaviour
         SnapToSlot.onSnapTime -= SetTimeSelected;
         NameInPack.onToggleChange -= ToggleChange;
         NameInPack.onDelete -= ConfirmDeleteNameLabelOn;
-
-        DataManager.onNamesEmpty -= SetGameStatus;
     }
 
     private void SetFirstTimeGame(SavedData savedData)
     {
         currentSavedData = savedData;
     }
-    private void SetGameStatus(bool status)
-    {
-        gameStatus = status;
-    }
-
     #region SceneManagement
     public void LoadNextScene()
     {
-        if(gameStatus)
-            StartCoroutine(Load());
+        StartCoroutine(Load());
     }
     IEnumerator Load()
     {
@@ -155,13 +142,14 @@ public class MenuManager : MonoBehaviour
 
         onSetGame?.Invoke(currentSavedData);
     }
+    #region Button Manage
     public void NumberOfPlayersOn()
     {
         secondScreenTitle.text = EnumTitle.Players.ToString();
         playersScroolView.SetActive(true);
         spyesScroolView.SetActive(false);
         timeScroolView.SetActive(false);
-        onSecondScreenOn?.Invoke();
+        onSecondScreen?.Invoke(true);
     }
     public void NumberOfSpyesOn()
     {
@@ -169,7 +157,7 @@ public class MenuManager : MonoBehaviour
         spyesScroolView.SetActive(true);
         playersScroolView.SetActive(false);
         timeScroolView.SetActive(false);
-        onSecondScreenOn?.Invoke();
+        onSecondScreen?.Invoke(true);
     }
     public void TimeSelectOn()
     {
@@ -177,26 +165,104 @@ public class MenuManager : MonoBehaviour
         timeScroolView.SetActive(true);
         spyesScroolView.SetActive(false);
         playersScroolView.SetActive(false);
-        onSecondScreenOn?.Invoke();
+        onSecondScreen?.Invoke(true);
+    }
+    public void SubjectSelectionOn()
+    {
+        deletePackIcon.SetActive(false);
+        StartCoroutine(ClearThirdScreen(0f));
+    }
+    public void HowToPlayScreenOn()
+    {
+        onHowToPlayScreen?.Invoke(true);
+    }
+    private void HowToPlayScreenOff()
+    {
+        onHowToPlayScreen?.Invoke(false);
     }
     public void SubjectsOn()
     {
         secondScreenTitle.text = EnumTitle.Subjects.ToString();
-        onThirdScreenOn?.Invoke();
+        onThirdScreen?.Invoke(true);
     }
-    private void SetNumberOfPlayers(int num)
+    public void SubjectSelected(List<PackData> packs, string packName, PackType packType)
     {
-        currentSavedData.players = num;
+        NameInPack nameInPack;
+
+        currentPacks = packs;
+        currentPackName = packName;
+        thirdScreenTitle.text = currentPackName;
+
+        for (int i = 0; i < packs.Count; i++)
+        {
+            currentNameInPack = Instantiate(nameOfPrefab, transform.position, Quaternion.identity, namesScroolViewContent.transform);
+            nameInPack = currentNameInPack.GetComponent<NameInPack>();
+
+            nameInPack.SetGameObject(i, packs[i].name, packs[i].status);
+            nameInPack.ToggleOn();
+
+            if (packType == PackType.Default)
+                nameInPack.DisableDelete();
+        }
+
+        namesScroolView.SetActive(true);
+        subjScroolView.SetActive(false);
     }
-    private void SetNumberOfSpyes(int num)
+
+    public void ConfirmedNumberSelection()
     {
-        currentSavedData.spyes = num;
+        SetSavedDataUI(currentSavedData);
+        playersScroolView.SetActive(false);
+        spyesScroolView.SetActive(false);
+        timeScroolView.SetActive(false);
+
+        onSecondScreen?.Invoke(false);
     }
-    private void SetTimeSelected(int num)
+    public void ConfirmedSubjectSelection()
     {
-        currentSavedData.time = num;
+        bool randCanHappen = CheckIfRandomCanHappen();
+
+        if (randCanHappen)
+        {
+            currentSavedData.pack = currentPacks;
+            currentSavedData.packName = currentPackName;
+            onPackChange?.Invoke(currentSavedData.pack, currentSavedData.packName);
+            SetSavedDataUI(currentSavedData);
+
+            ThirdsScreenOff();
+        }
+        else
+        {
+            packEmptyError.SetActive(true);
+            StartCoroutine(ErrorLabelOff());
+        }
     }
-    
+    private bool CheckIfRandomCanHappen()
+    {
+        foreach(PackData pack in currentPacks)
+        {
+            if (pack.status == true)
+                return true;
+        }
+        return false;
+    }
+    IEnumerator ErrorLabelOff()
+    {
+        yield return new WaitForSeconds(1.6f);
+        packEmptyError.SetActive(false);
+    }
+    public void ThirdsScreenOff()
+    {
+        onThirdScreen?.Invoke(false);
+        StartCoroutine(ClearThirdScreen(0.5f));
+    }
+    public void ScreensOff()
+    {
+        onSecondScreen?.Invoke(false);
+        ThirdsScreenOff();
+        HowToPlayScreenOff();
+    }
+    #endregion
 
     #region Custom Subject
     private void CustomSubjectSelected(GameObject pack)
@@ -229,8 +295,8 @@ public class MenuManager : MonoBehaviour
     #region Custom Name
     private void ToggleChange(int namePlace, bool status)
     {
-        currentPack[namePlace].status = status;
-        onPackChange?.Invoke(currentPack, currentPackName);
+        currentPacks[namePlace].status = status;
+        onPackChange?.Invoke(currentPacks, currentPackName);
     }
     public void AddCustomWord(TMP_InputField inputField)
     {
@@ -238,8 +304,8 @@ public class MenuManager : MonoBehaviour
 
         if (inputField.text != "")
         {
-            currentPack.Add(new PackData(inputField.text, true));
-            onPackChange?.Invoke(currentPack, currentPackName);
+            currentPacks.Add(new PackData(inputField.text, true));
+            onPackChange?.Invoke(currentPacks, currentPackName);
 
             currentNameInPack = Instantiate(nameOfPrefab, transform.position, Quaternion.identity, namesScroolViewContent.transform);
             nameInPack = currentNameInPack.GetComponent<NameInPack>();
@@ -263,65 +329,27 @@ public class MenuManager : MonoBehaviour
     }
     public void ConfirmDeleteName()
     {
-        currentPack.RemoveAt(currentNameInPackPos);
+        currentPacks.RemoveAt(currentNameInPackPos);
         Destroy(currentNameInPack);
         ConfirmDeleteNameLabelOff();
 
-        onPackChange?.Invoke(currentPack, currentPackName);
+        onPackChange?.Invoke(currentPacks, currentPackName);
     }
     #endregion
 
-    public void SubjectSelected(List<PackData> pack, string packName,PackType packType)
+    private void SetNumberOfPlayers(int num)
     {
-        NameInPack nameInPack;
-
-        currentPack = pack;
-        currentPackName = packName;
-        thirdScreenTitle.text = currentPackName;
-
-        for (int i = 0; i < pack.Count; i++)
-        {
-            currentNameInPack = Instantiate(nameOfPrefab, transform.position, Quaternion.identity, namesScroolViewContent.transform);
-            nameInPack = currentNameInPack.GetComponent<NameInPack>();
-
-            nameInPack.SetGameObject(i, pack[i].name, pack[i].status);
-            nameInPack.ToggleOn();
-
-            if (packType == PackType.Default)
-                nameInPack.DisableDelete();
-        }
-
-        namesScroolView.SetActive(true);
-        subjScroolView.SetActive(false);
+        currentSavedData.players = num;
     }
-    public void SubjectSelectionOn()
+    private void SetNumberOfSpyes(int num)
     {
-        deletePackIcon.SetActive(false);
-        StartCoroutine(ClearThirdScreen(0f));
+        currentSavedData.spyes = num;
     }
-    public void ConfirmedNumberSelection()
+    private void SetTimeSelected(int num)
     {
-        SetSavedDataUI(currentSavedData);
-        playersScroolView.SetActive(false);
-        spyesScroolView.SetActive(false);
-        timeScroolView.SetActive(false);
+        currentSavedData.time = num;
+    }
 
-        onSecondScreenOff?.Invoke();
-    }
-    public void ConfirmedSubjectSelection()
-    {
-        currentSavedData.pack = currentPack;
-        currentSavedData.packName = currentPackName;
-        onPackChange?.Invoke(currentSavedData.pack, currentSavedData.packName);
-        SetSavedDataUI(currentSavedData);
-
-        ThirdsScreenOff();
-    }
-    public void ThirdsScreenOff()
-    {
-        onThirdScreenOff?.Invoke();
-        StartCoroutine(ClearThirdScreen(0.5f));
-    }
     IEnumerator ClearThirdScreen(float waitForSeconds)
     {
         yield return new WaitForSeconds(waitForSeconds);
@@ -332,13 +360,10 @@ public class MenuManager : MonoBehaviour
         }
         namesScroolView.SetActive(false);
         subjScroolView.SetActive(true);
+        deletePackIcon.SetActive(false);
         thirdScreenTitle.text = "נושאים";
     } 
-    public void ScreensOff()
-    {
-        onSecondScreenOff?.Invoke();
-        ThirdsScreenOff();
-    }
     
+
     #endregion
 }

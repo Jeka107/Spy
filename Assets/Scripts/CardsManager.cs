@@ -8,22 +8,22 @@ public class CardsManager : MonoBehaviour
     public static event OnGetNumberOfPlayers onGetNumberOfPlayers;
     public delegate int OnGetNumberOfSpyes();
     public static event OnGetNumberOfSpyes onGetNumberOfSpyes;
-    public delegate int OnGetTimer();
-    public static event OnGetTimer onGetTimer;
     public delegate string OnGetWord();
     public static event OnGetWord onGetWord;
+    public delegate void OnDeckEmpty();
+    public static event OnDeckEmpty onDeckEmpty;
 
     [SerializeField] private GameObject canvas;
     [SerializeField] private GameObject card;
-    [SerializeField] private int numOfCards=0;
-    [SerializeField] private int numOfSpyes=0;
-    [SerializeField] private int timer = 0;
+    [SerializeField] private int numOfCards;
+    [SerializeField] private int numOfSpyes;
     [SerializeField] private string word;
     [SerializeField] private int distance;
     [SerializeField] private float movementSpeed;
     [SerializeField] private float speedDeck;
     [SerializeField] private List<GameObject> deckOfCard = new List<GameObject>();
     [SerializeField] private List<int> spyesPlaces = new List<int>();
+
     private GameObject currentCard;
     private CardController cardController;
     private Vector3 currentCardPos=Vector3.zero;
@@ -31,17 +31,22 @@ public class CardsManager : MonoBehaviour
 
     private void Awake()
     {
-        numOfCards = onGetNumberOfPlayers.Invoke();
-        numOfSpyes = onGetNumberOfSpyes.Invoke();
-        timer = onGetTimer.Invoke();
-        word = onGetWord.Invoke();
+        if (FindObjectOfType<DataManager>() != null)
+        {
+            numOfCards = onGetNumberOfPlayers.Invoke();
+            numOfSpyes = onGetNumberOfSpyes.Invoke();
+            word = onGetWord?.Invoke();
+        }
         CreateListNumbers();
         CreateCards();
+
         CardController.onMovingDeck += StartMoveDeckOfCards;
+        CardController.onCheckLastCard += CheckCardsEmpty;
     }
     private void OnDestroy()
     {
         CardController.onMovingDeck -= StartMoveDeckOfCards;
+        CardController.onCheckLastCard -= CheckCardsEmpty;
     }
     private void CreateListNumbers()
     {
@@ -103,5 +108,11 @@ public class CardsManager : MonoBehaviour
             step--;
             yield return new WaitForSeconds(speedDeck);
         }
+    }
+
+    private void CheckCardsEmpty()
+    {
+        if (deckOfCard.Count == 1)
+            onDeckEmpty?.Invoke();
     }
 }

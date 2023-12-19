@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -35,11 +34,15 @@ public class NewPack : MonoBehaviour
         onSelected?.Invoke(pack, packName.text,PackType.Custom);
         onSelectedCustomPack?.Invoke(this.gameObject);
     }
-    public void SetPackName(string _packName)
+    public void SetNewPackName(string _packName)
     {
         packName.text = _packName;
         onAddNewPack?.Invoke(_packName);
         onSavePack?.Invoke(pack, _packName);
+    }
+    public void SetPackName(string _packName)
+    {
+        packName.text = _packName;
     }
     public void DeleteThisPack()
     {

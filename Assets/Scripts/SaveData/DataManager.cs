@@ -1,12 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
-    public delegate void OnNamesEmpty(bool status);
-    public static event OnNamesEmpty onNamesEmpty;
-
     [SerializeField] private int numberOfPlayers;
     [SerializeField] private int numberOfSpyes;
     [SerializeField] private int timer;
@@ -22,12 +18,13 @@ public class DataManager : MonoBehaviour
             DontDestroyOnLoad(this.gameObject);
             created = true;
         }
+
         MenuManager.onSetGame += SetGame;
 
         //Get Data from menu. 
         CardsManager.onGetNumberOfPlayers += GetNumberOfPlayers;
         CardsManager.onGetNumberOfSpyes += GetNumberOfSpyes;
-        CardsManager.onGetTimer += GetTimer;
+        GameManager.onGetTimer += GetTimer;
         CardsManager.onGetWord += GetRandomWord;
     }
     private void OnDestroy()
@@ -36,7 +33,7 @@ public class DataManager : MonoBehaviour
 
         CardsManager.onGetNumberOfPlayers -= GetNumberOfPlayers;
         CardsManager.onGetNumberOfSpyes -= GetNumberOfSpyes;
-        CardsManager.onGetTimer -= GetTimer;
+        GameManager.onGetTimer -= GetTimer;
         CardsManager.onGetWord -= GetRandomWord;
     }
     private void SetGame(SavedData savedData)
@@ -59,11 +56,6 @@ public class DataManager : MonoBehaviour
             int rand = Random.Range(0, names.Count - 1);
             randomWord = names[rand];
         }
-        if (names.Count == 0)
-            onNamesEmpty?.Invoke(false);
-        else
-            onNamesEmpty?.Invoke(true);
-
     }
     private int GetNumberOfPlayers()
     {

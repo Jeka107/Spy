@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -36,8 +35,8 @@ public class SaveDataManager : MonoBehaviour
 {
     public delegate void OnFirstTimePack(SavedData savedData);
     public static event OnFirstTimePack onFirstTimePack;
-    public delegate void OnCreateSavedCustomPacks(string name);
-    public static event OnCreateSavedCustomPacks onCreateSavedCustomPacks;
+    public delegate void OnCreateCustomPacks(string name);
+    public static event OnCreateCustomPacks onCreateCustomPacks;
 
     private string saveFolderName = "Saved_Data_JSON";
     private string savedDataFileName = "SaveData.Json";
@@ -82,6 +81,10 @@ public class SaveDataManager : MonoBehaviour
         NewPack.onAddNewPack += AddCustomPack;
         NewPack.onSavePack += SaveListJson;
         NewPack.onDeleteThisPack += RemoveSavedCustomPack;
+    }
+    private void Start()
+    {
+        
     }
     private void OnDestroy()
     {
@@ -230,9 +233,9 @@ public class SaveDataManager : MonoBehaviour
     #region Custom Pack Data Manager
     private void CreateSavedCustomPacks()
     {
-        foreach(CustomPacksData customPacksData in customPacks)
+        foreach(CustomPacksData customPackData in customPacks)
         {
-            onCreateSavedCustomPacks?.Invoke(customPacksData.name);
+            onCreateCustomPacks?.Invoke(customPackData.name);
         }
     }
     private void RemoveSavedCustomPack(string packName)

@@ -9,6 +9,12 @@ public class CardController : MonoBehaviour
     public delegate void OnMovingDeck();
     public static event OnMovingDeck onMovingDeck;
 
+    public delegate void OnFlipCard(string explanation);
+    public static event OnFlipCard onFlipCard;
+
+    public delegate void OnCheckLastCard();
+    public static event OnCheckLastCard onCheckLastCard;
+
     [SerializeField] private GameObject cardSides;
 
     [Space]
@@ -24,6 +30,7 @@ public class CardController : MonoBehaviour
 
     private bool facedDown=true;
     private Animator animatorCard,animatorCardSides;
+    private bool spy = false;
 
     private void Awake()
     {
@@ -36,16 +43,26 @@ public class CardController : MonoBehaviour
     {
         if (facedDown)
         {
+            if(spy)
+                onFlipCard?.Invoke(EnumExplanation.Spy);
+            else
+                onFlipCard?.Invoke(EnumExplanation.TapCardAgain);
+
             animatorCardSides.enabled = true;
             animatorCardSides.Play("CardFlip");
             facedDown = false;
         }
         else
         {
+            cardBackTextGO.SetActive(false);
+            onFlipCard?.Invoke(EnumExplanation.TapCard);
+
             animatorCard.enabled = true;
             animatorCard.Play("CardDisappear");
 
             StartCoroutine(MoveDeck());
+            onCheckLastCard.Invoke();
+
             Destroy(gameObject, 0.5f);
         }
     }
@@ -54,9 +71,9 @@ public class CardController : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         onMovingDeck?.Invoke();
     }
-    public void SetCardBackText(int numOfCard)
+    public void SetCardBackText(int _numOfPlayer)
     {
-        cardNumText.text = numOfCard.ToString();
+        cardNumText.text = _numOfPlayer.ToString();
     }
     public void ActivateCardBackText()
     {
@@ -68,6 +85,7 @@ public class CardController : MonoBehaviour
     }
     public void SetSpyCard()
     {
+        spy = true;
         imageCardFace.sprite = cardSpySprite;
         cardFaceText.text = "מרגל";
     }
