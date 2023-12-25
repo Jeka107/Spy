@@ -52,6 +52,7 @@ Library: C:\UnityProjectGit\Spy\Temp\BurstOutput\tempburstlibs\armeabi-v7a\lib_b
 --assembly-defines=mscorlib;
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\UnityProjectGit\Spy\Temp\Burst
+--debug=Full
 --key-folder=C:/Program Files/Unity/Hub/Editor/2022.3.12f1/Editor/Data/PlaybackEngines/AndroidPlayer
 --decode-folder=C:\UnityProjectGit\Spy\Library\Burst
 --output=C:\UnityProjectGit\Spy\Temp\BurstOutput\tempburstlibs\armeabi-v7a\lib_burst_generated

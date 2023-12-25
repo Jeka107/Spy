@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
@@ -20,6 +21,11 @@ public class MenuManager : MonoBehaviour
     public static event OnSetGame onSetGame;
     public delegate void OnPackChange(List<PackData> pack, string packName);
     public static event OnPackChange onPackChange;
+
+    public delegate IEnumerator OnBlurOn(Image image);
+    public static event OnBlurOn onBlurOn;
+    public delegate IEnumerator OnBlurOff(Image image);
+    public static event OnBlurOff onBlurOff;
     //
 
     [Header("Scene Management")]
@@ -64,11 +70,13 @@ public class MenuManager : MonoBehaviour
     private SavedData currentSavedData=new SavedData();
 
     private Animator blurAnimator;
+    private Image blurImage;
 
     private void Awake()
     {
         namesScroolView.SetActive(false);
         blurAnimator = blur.GetComponent<Animator>();
+        blurImage = blur.GetComponent<Image>();
 
         //first time playing
         SaveDataManager.onFirstTimePack += SetFirstTimeGame;
@@ -273,12 +281,12 @@ public class MenuManager : MonoBehaviour
     public void CustomSubjectConfirmDelete()
     {
         confirmDeletePackLabel.SetActive(true);
-        blurAnimator.SetBool("Screen", true);
+        StartCoroutine(onBlurOn?.Invoke(blurImage));
     }
     public void CustomSubjectCancelDelete()
     {
         confirmDeletePackLabel.SetActive(false);
-        blurAnimator.SetBool("Screen", false);
+        StartCoroutine(onBlurOff?.Invoke(blurImage));
     }
     public void CustomSubjectDelete()
     {
@@ -320,12 +328,12 @@ public class MenuManager : MonoBehaviour
         currentNameInPackPos = _currentNameInPackPos;
 
         confirmDeleteNameLabel.SetActive(true);
-        blurAnimator.SetBool("Screen", true);
+        StartCoroutine(onBlurOn?.Invoke(blurImage));
     }
     public void ConfirmDeleteNameLabelOff()
     {
         confirmDeleteNameLabel.SetActive(false);
-        blurAnimator.SetBool("Screen", false);
+        StartCoroutine(onBlurOff?.Invoke(blurImage));
     }
     public void ConfirmDeleteName()
     {
