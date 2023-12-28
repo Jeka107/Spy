@@ -291,7 +291,7 @@ public class MenuManager : MonoBehaviour
     public void CustomSubjectDelete()
     {
         currentGameObject.GetComponent<NewPack>().DeleteThisPack();
-        blurAnimator.SetBool("Screen", false);
+        StartCoroutine(onBlurOff?.Invoke(blurImage));
 
         namesScroolView.SetActive(false);
         subjScroolView.SetActive(true);
