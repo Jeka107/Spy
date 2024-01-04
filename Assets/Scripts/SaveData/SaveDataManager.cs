@@ -55,7 +55,7 @@ public class SaveDataManager : MonoBehaviour
 
         if (!File.Exists(savedDatafilePath))
         {
-            TextFileStorage.onAwake += CreateJsonPack;
+            DefaultPack.onAwake += CreateJsonPack;
         }
         else
         {
@@ -70,7 +70,7 @@ public class SaveDataManager : MonoBehaviour
             customPacks = LoadListJson<CustomPacksData>("CustomPacksData");
             CreateSavedCustomPacks();
         }
-        TextFileStorage.onLoadPack += LoadListJson<PackData>;
+        DefaultPack.onLoadPack += LoadListJson<PackData>;
 
         SnapToSlot.onNumberSnapedOnStartGame += GetSavedData;
         MenuManager.onLoadSavedDataToUI += GetSavedData;
@@ -82,14 +82,10 @@ public class SaveDataManager : MonoBehaviour
         NewPack.onSavePack += SaveListJson;
         NewPack.onDeleteThisPack += RemoveSavedCustomPack;
     }
-    private void Start()
-    {
-        
-    }
     private void OnDestroy()
     {
-        TextFileStorage.onAwake -= CreateJsonPack;
-        TextFileStorage.onLoadPack -= LoadListJson<PackData>;
+        DefaultPack.onAwake -= CreateJsonPack;
+        DefaultPack.onLoadPack -= LoadListJson<PackData>;
 
         SnapToSlot.onNumberSnapedOnStartGame -= GetSavedData;
         MenuManager.onLoadSavedDataToUI -= GetSavedData;
@@ -109,7 +105,7 @@ public class SaveDataManager : MonoBehaviour
         {
             Directory.CreateDirectory(Path.GetDirectoryName(savedDatafilePath));
         }
-
+        
         string dataInJSON = JsonUtility.ToJson(currentSavedData, true);
         FileStream fs = new FileStream(savedDatafilePath, FileMode.Create);
 

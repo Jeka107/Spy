@@ -21,8 +21,8 @@ public static class EnumExplanation
 {
     public const string
         TapCard = "הקש על הקלף",
-        TapCardAgain = "הקש שוב על הקלף ותעביר לבן אדם הבא",
-        Spy = "אתה המרגל, תגלה את מילת המפתח מבלי שיעלו עליך",
+        TapCardAgain = "הקש שוב על הקלף והעבר לשחקן הבא",
+        Spy = "אתה המרגל !"+ "\n\n" + "גלה את מילת המפתח מבלי שיחשפו אותך" + "\n\n"+ TapCardAgain,
         TimerOn = "גלו מי המרגל לפני שהזמן נגמר";
 }
 

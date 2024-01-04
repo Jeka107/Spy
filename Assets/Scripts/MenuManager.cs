@@ -36,7 +36,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject subjScroolView;
     [SerializeField] private GameObject subjScroolViewContent;
     [SerializeField] private GameObject namesScroolView;
-    [SerializeField] private GameObject namesScroolViewContent;
+    
     [SerializeField] private TextMeshProUGUI numberOfPlayersText;
     [SerializeField] private TextMeshProUGUI numberOfSpyesText;
     [SerializeField] private TextMeshProUGUI timeSelected;
@@ -63,28 +63,28 @@ public class MenuManager : MonoBehaviour
 
     private GameObject currentGameObject;
     private GameObject currentNameInPack;
-    private List<PackData> currentPacks = new List<PackData>();
+    private GameObject namesScroolViewContent;
+    private List<PackData> currentPackDatas = new List<PackData>();
     private string currentPackName;
+    private ScrollRect scrollRectNamesScroolView;
     private int currentNameInPackPos;
 
     private SavedData currentSavedData=new SavedData();
-
-    private Animator blurAnimator;
     private Image blurImage;
 
     private void Awake()
     {
         namesScroolView.SetActive(false);
-        blurAnimator = blur.GetComponent<Animator>();
+        scrollRectNamesScroolView = namesScroolView.GetComponent<ScrollRect>();
         blurImage = blur.GetComponent<Image>();
 
         //first time playing
         SaveDataManager.onFirstTimePack += SetFirstTimeGame;
 
-        TextFileStorage.onSelected += SubjectSelected;
+        DefaultPack.onSelected += SubjectSelected;
         NewPack.onSelected += SubjectSelected;
         NewPack.onSelectedCustomPack += CustomSubjectSelected;
-        NewPack.onDefaultPack += DefaultPack;
+        NewPack.onDefaultPack += StartPack;
         SnapToSlot.onSnapNumberOfPlayers += SetNumberOfPlayers;
         SnapToSlot.onSnapNumberOfSpyes += SetNumberOfSpyes;
         SnapToSlot.onSnapTime += SetTimeSelected;
@@ -104,10 +104,10 @@ public class MenuManager : MonoBehaviour
     {
         SaveDataManager.onFirstTimePack -= SetFirstTimeGame;
 
-        TextFileStorage.onSelected -= SubjectSelected;
+        DefaultPack.onSelected -= SubjectSelected;
         NewPack.onSelected -= SubjectSelected;
         NewPack.onSelectedCustomPack -= CustomSubjectSelected;
-        NewPack.onDefaultPack -= DefaultPack;
+        NewPack.onDefaultPack -= StartPack;
         SnapToSlot.onSnapNumberOfPlayers -= SetNumberOfPlayers;
         SnapToSlot.onSnapNumberOfSpyes -= SetNumberOfSpyes;
         SnapToSlot.onSnapTime -= SetTimeSelected;
@@ -131,9 +131,9 @@ public class MenuManager : MonoBehaviour
     }
     #endregion
     #region UI Managment
-    private void DefaultPack()
+    private void StartPack()
     {
-        TextFileStorage currentContentChild = subjScroolViewContent.transform.GetChild(0).gameObject.GetComponent<TextFileStorage>();
+        DefaultPack currentContentChild = subjScroolViewContent.transform.GetChild(0).gameObject.GetComponent<DefaultPack>();
 
         currentSavedData.pack = currentContentChild.GetPack();
         currentSavedData.packName = currentContentChild.GetPackName();
@@ -179,6 +179,7 @@ public class MenuManager : MonoBehaviour
     {
         deletePackIcon.SetActive(false);
         StartCoroutine(ClearThirdScreen(0f));
+        
     }
     public void HowToPlayScreenOn()
     {
@@ -193,25 +194,12 @@ public class MenuManager : MonoBehaviour
         secondScreenTitle.text = EnumTitle.Subjects.ToString();
         onThirdScreen?.Invoke(true);
     }
-    public void SubjectSelected(List<PackData> packs, string packName, PackType packType)
+    public void SubjectSelected(List<PackData> packDatas, string packName, GameObject content)
     {
-        NameInPack nameInPack;
-
-        currentPacks = packs;
-        currentPackName = packName;
-        thirdScreenTitle.text = currentPackName;
-
-        for (int i = 0; i < packs.Count; i++)
-        {
-            currentNameInPack = Instantiate(nameOfPrefab, transform.position, Quaternion.identity, namesScroolViewContent.transform);
-            nameInPack = currentNameInPack.GetComponent<NameInPack>();
-
-            nameInPack.SetGameObject(i, packs[i].name, packs[i].status);
-            nameInPack.ToggleOn();
-
-            if (packType == PackType.Default)
-                nameInPack.DisableDelete();
-        }
+        currentPackDatas = packDatas;
+        thirdScreenTitle.text=currentPackName = packName;
+        namesScroolViewContent = content;
+        scrollRectNamesScroolView.content = content.GetComponent<RectTransform>();//atach content.
 
         namesScroolView.SetActive(true);
         subjScroolView.SetActive(false);
@@ -232,7 +220,7 @@ public class MenuManager : MonoBehaviour
 
         if (randCanHappen)
         {
-            currentSavedData.pack = currentPacks;
+            currentSavedData.pack = currentPackDatas;
             currentSavedData.packName = currentPackName;
             onPackChange?.Invoke(currentSavedData.pack, currentSavedData.packName);
             SetSavedDataUI(currentSavedData);
@@ -247,7 +235,7 @@ public class MenuManager : MonoBehaviour
     }
     private bool CheckIfRandomCanHappen()
     {
-        foreach(PackData pack in currentPacks)
+        foreach(PackData pack in currentPackDatas)
         {
             if (pack.status == true)
                 return true;
@@ -273,9 +261,9 @@ public class MenuManager : MonoBehaviour
     #endregion
 
     #region Custom Subject
-    private void CustomSubjectSelected(GameObject pack)
+    private void CustomSubjectSelected(GameObject gameObjectPack)
     {
-        currentGameObject = pack;
+        currentGameObject = gameObjectPack;
         deletePackIcon.SetActive(true);
     }
     public void CustomSubjectConfirmDelete()
@@ -303,8 +291,8 @@ public class MenuManager : MonoBehaviour
     #region Custom Name
     private void ToggleChange(int namePlace, bool status)
     {
-        currentPacks[namePlace].status = status;
-        onPackChange?.Invoke(currentPacks, currentPackName);
+        currentPackDatas[namePlace].status = status;
+        onPackChange?.Invoke(currentPackDatas, currentPackName);
     }
     public void AddCustomWord(TMP_InputField inputField)
     {
@@ -312,8 +300,8 @@ public class MenuManager : MonoBehaviour
 
         if (inputField.text != "")
         {
-            currentPacks.Add(new PackData(inputField.text, true));
-            onPackChange?.Invoke(currentPacks, currentPackName);
+            currentPackDatas.Add(new PackData(inputField.text, true));
+            onPackChange?.Invoke(currentPackDatas, currentPackName);
 
             currentNameInPack = Instantiate(nameOfPrefab, transform.position, Quaternion.identity, namesScroolViewContent.transform);
             nameInPack = currentNameInPack.GetComponent<NameInPack>();
@@ -337,11 +325,11 @@ public class MenuManager : MonoBehaviour
     }
     public void ConfirmDeleteName()
     {
-        currentPacks.RemoveAt(currentNameInPackPos);
+        currentPackDatas.RemoveAt(currentNameInPackPos);
         Destroy(currentNameInPack);
         ConfirmDeleteNameLabelOff();
 
-        onPackChange?.Invoke(currentPacks, currentPackName);
+        onPackChange?.Invoke(currentPackDatas, currentPackName);
     }
     #endregion
 
@@ -362,13 +350,10 @@ public class MenuManager : MonoBehaviour
     {
         yield return new WaitForSeconds(waitForSeconds);
 
-        while (namesScroolViewContent.transform.childCount > 0)
-        {
-            DestroyImmediate(namesScroolViewContent.transform.GetChild(0).gameObject);
-        }
-        namesScroolView.SetActive(false);
-        subjScroolView.SetActive(true);
-        deletePackIcon.SetActive(false);
+        namesScroolViewContent?.SetActive(false);
+        namesScroolView?.SetActive(false);
+        subjScroolView?.SetActive(true);
+        deletePackIcon?.SetActive(false);
         thirdScreenTitle.text = "נושאים";
     } 
     

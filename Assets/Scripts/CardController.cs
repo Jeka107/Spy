@@ -31,6 +31,7 @@ public class CardController : MonoBehaviour
     private bool facedDown=true;
     private Animator animatorCard,animatorCardSides;
     private bool spy = false;
+    public int numOfPlayer;
 
     private void Awake()
     {
@@ -63,8 +64,13 @@ public class CardController : MonoBehaviour
             StartCoroutine(MoveDeck());
             onCheckLastCard.Invoke();
 
-            Destroy(gameObject, 0.5f);
+            StartCoroutine(DisableCard());
         }
+    }
+    IEnumerator DisableCard()
+    {
+        yield return new WaitForSeconds(0.5f);
+        gameObject.SetActive(false);
     }
     IEnumerator MoveDeck()
     {
@@ -73,6 +79,7 @@ public class CardController : MonoBehaviour
     }
     public void SetCardBackText(int _numOfPlayer)
     {
+        numOfPlayer = _numOfPlayer;
         cardNumText.text = _numOfPlayer.ToString();
     }
     public void ActivateCardBackText()
@@ -88,5 +95,6 @@ public class CardController : MonoBehaviour
         spy = true;
         imageCardFace.sprite = cardSpySprite;
         cardFaceText.text = "מרגל";
+        cardFaceText.color = Color.red;
     }
 }

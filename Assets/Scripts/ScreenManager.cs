@@ -39,16 +39,6 @@ public class ScreenManager : MonoBehaviour
         MenuManager.onBlurOn -= BlurEffectOn;
         MenuManager.onBlurOff -= BlurEffectOff;
     }
-    private void Update()
-    {
-        if(move)
-        {
-            currentScreen.transform.localPosition = Vector2.MoveTowards(currentScreen.transform.localPosition,
-                currentWayPoint, speed * Time.deltaTime);
-            if(currentScreen.transform.localPosition == currentWayPoint)
-                move = false;
-        }
-    }
     private void SecondScreenAction(bool status)
     { 
         if(status)
@@ -64,9 +54,9 @@ public class ScreenManager : MonoBehaviour
 
             StartCoroutine(BlurEffectOff(blurImage));
         }
-        move = true;  
+        move = true;
+        StartCoroutine(MoveScreens());
     }
-
     private void ThirdScreenAction(bool status)
     {
         if (status)
@@ -83,8 +73,8 @@ public class ScreenManager : MonoBehaviour
             StartCoroutine(BlurEffectOff(blurImage));
         }
         move = true;
+        StartCoroutine(MoveScreens());
     }
-
     private void howToPlayScreenAction(bool status)
     {
         if (status)
@@ -101,6 +91,18 @@ public class ScreenManager : MonoBehaviour
             StartCoroutine(BlurEffectOff(blurImage));
         }
         move = true;
+        StartCoroutine(MoveScreens());
+    }
+    IEnumerator MoveScreens()
+    {
+        while (move)
+        {
+            currentScreen.transform.localPosition = Vector2.MoveTowards(currentScreen.transform.localPosition,
+                currentWayPoint, speed * Time.deltaTime);
+            if (currentScreen.transform.localPosition == currentWayPoint)
+                move = false;
+            yield return new WaitForEndOfFrame();
+        }
     }
     IEnumerator BlurEffectOn(Image blurImage)
     {

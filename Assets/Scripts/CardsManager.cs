@@ -22,12 +22,12 @@ public class CardsManager : MonoBehaviour
     [SerializeField] private float movementSpeed;
     [SerializeField] private float speedDeck;
     [SerializeField] private List<GameObject> deckOfCard = new List<GameObject>();
-    [SerializeField] private List<int> spyesPlaces = new List<int>();
+    [SerializeField] public List<int> spyesPlaces = new List<int>();
 
     private GameObject currentCard;
     private CardController cardController;
     private Vector3 currentCardPos=Vector3.zero;
-    private List<int> listNumbers = new List<int>();
+    [SerializeField] private List<int> listNumbers = new List<int>();
 
     private void Awake()
     {
@@ -50,7 +50,7 @@ public class CardsManager : MonoBehaviour
     }
     private void CreateListNumbers()
     {
-        for(int i=0;i<numOfCards;i++)
+        for(int i= 0; i< numOfCards; i++)
         {
             listNumbers.Add(i);
         }
@@ -77,29 +77,31 @@ public class CardsManager : MonoBehaviour
     }
     private void RandmSpyes()
     {
-        for(int i=0;i< numOfSpyes;i++)
+        CardController currentCardController;
+
+        for (int i=0;i< numOfSpyes;i++)
         {
             int rand = Random.Range(0, listNumbers.Count);
-            spyesPlaces.Add(rand);//to show who the spyes.
 
-            deckOfCard[listNumbers[rand]].GetComponent<CardController>().SetSpyCard();
+            currentCardController = deckOfCard[listNumbers[rand]].GetComponent<CardController>();
+            currentCardController.SetSpyCard();
+            spyesPlaces.Add(currentCardController.numOfPlayer);//to show who the spyes.
             listNumbers.RemoveAt(rand);
         }
     }
     private void StartMoveDeckOfCards()
     {
-        deckOfCard.RemoveAt(deckOfCard.Count - 1);
-
-        if(deckOfCard.Count!=0)
+        numOfCards--;
+        if (numOfCards != 0)
             StartCoroutine(MoveDeckOfCards());
     }
     IEnumerator MoveDeckOfCards()
     {
         yield return new WaitForSeconds(0.1f);
 
-        int step = deckOfCard.Count-1;
+        int step = numOfCards - 1;
 
-        deckOfCard[deckOfCard.Count - 1].GetComponent<CardController>().ActivateCardBackText();
+        deckOfCard[step].GetComponent<CardController>().ActivateCardBackText();
 
         while (step >= 0)
         {
@@ -112,7 +114,10 @@ public class CardsManager : MonoBehaviour
 
     private void CheckCardsEmpty()
     {
-        if (deckOfCard.Count == 1)
+        if (numOfCards == 1)
+        {
             onDeckEmpty?.Invoke();
+            spyesPlaces.Sort();
+        }
     }
 }
