@@ -1058,6 +1058,7 @@ MonoBehaviour:
   cardsManager: {fileID: 5762052297047002601}
   Spyes: {fileID: 782553451}
   numsOfSpyes: {fileID: 98923649}
+  admobAds: {fileID: 1908162086}
 --- !u!4 &1041347463
 Transform:
   m_ObjectHideFlags: 0
@@ -1354,6 +1355,55 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3140953631504298432, guid: 273dd984829122a4ab9ffa3c1c76de6d, type: 3}
   m_PrefabInstance: {fileID: 1345291276}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1908162084
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1908162085}
+  - component: {fileID: 1908162086}
+  m_Layer: 0
+  m_Name: AdsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1908162085
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1908162084}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1908162086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1908162084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a404d2aa5e6b3f49a724a661d6ad24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  appId: ca-app-pub-9281424649188142~6907582293
+  adPosition: 0
+  bannerId: ca-app-pub-9281424649188142/6289469348
+  interIdOnStartGame: ca-app-pub-9281424649188142/6621475987
+  interIdOnStartTimer: ca-app-pub-9281424649188142/5907160117
 --- !u!1 &3497246859495024285
 GameObject:
   m_ObjectHideFlags: 0
@@ -1418,3 +1468,4 @@ SceneRoots:
   - {fileID: 1243024523}
   - {fileID: 1248324021}
   - {fileID: 8794839770926449174}
+  - {fileID: 1908162085}

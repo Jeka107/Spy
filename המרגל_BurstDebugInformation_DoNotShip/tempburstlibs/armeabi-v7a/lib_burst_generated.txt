@@ -28,6 +28,12 @@ Library: C:\UnityProjectGit\Spy\Temp\BurstOutput\tempburstlibs\armeabi-v7a\lib_b
 --assembly-defines=Unity.Collections.LowLevel.ILSupport;
 --assembly-defines=Unity.VisualScripting.Antlr3.Runtime;
 --assembly-defines=Unity.Burst.Unsafe;
+--assembly-defines=GoogleMobileAds.Android;
+--assembly-defines=GoogleMobileAds.Common;
+--assembly-defines=GoogleMobileAds;
+--assembly-defines=GoogleMobileAds.Ump.Android;
+--assembly-defines=GoogleMobileAds.Core;
+--assembly-defines=GoogleMobileAds.Ump;
 --assembly-defines=System.Runtime;
 --assembly-defines=netstandard;
 --assembly-defines=Mono.Security;

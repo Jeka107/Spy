@@ -90,6 +90,8 @@ public class MenuManager : MonoBehaviour
         SnapToSlot.onSnapTime += SetTimeSelected;
         NameInPack.onToggleChange += ToggleChange;
         NameInPack.onDelete += ConfirmDeleteNameLabelOn;
+
+        
     }
     private void Start()
     {

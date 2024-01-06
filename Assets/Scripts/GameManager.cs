@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CardsManager cardsManager;
     [SerializeField] private GameObject Spyes;
     [SerializeField] private TextMeshProUGUI numsOfSpyes;
+    [SerializeField] private AdmobAdsScript admobAds;
 
     private TextMeshProUGUI explanationText;
     private bool timerStatus = false;
@@ -36,6 +38,7 @@ public class GameManager : MonoBehaviour
 
         explanationText = explanation.GetComponent<TextMeshProUGUI>();
         SetExplanationText(EnumExplanation.TapCard);
+        admobAds.LoadInterstitialAd("StartTimer");
     }
     private void OnDestroy()
     {
@@ -75,6 +78,7 @@ public class GameManager : MonoBehaviour
     }
     public void BackToHome()
     {
+        admobAds.DestroyBannerView();
         SceneManager.LoadScene("Menu");
     }
     private void SetExplanationText(string explanation)
@@ -89,6 +93,13 @@ public class GameManager : MonoBehaviour
         spyesPlaces = cardsManager.spyesPlaces;
         timerStatus = true;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        StartCoroutine(StartAds());
+    }
+    IEnumerator StartAds()
+    {
+        yield return new WaitForSeconds(1f);
+        admobAds.ShowInterstitialAd();
+        admobAds.LoadAd();
     }
     void DisplayTime(float timeToDisplay)
     {
