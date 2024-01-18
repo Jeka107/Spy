@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using CandyCoded.HapticFeedback;
 
 public class MenuManager : MonoBehaviour
 {
@@ -27,7 +28,6 @@ public class MenuManager : MonoBehaviour
     public delegate IEnumerator OnBlurOff(Image image);
     public static event OnBlurOff onBlurOff;
     //
-
     [Header("Scene Management")]
     [SerializeField] private float waitBeforeLoadScene;
    
@@ -90,8 +90,6 @@ public class MenuManager : MonoBehaviour
         SnapToSlot.onSnapTime += SetTimeSelected;
         NameInPack.onToggleChange += ToggleChange;
         NameInPack.onDelete += ConfirmDeleteNameLabelOn;
-
-        
     }
     private void Start()
     {
@@ -146,11 +144,28 @@ public class MenuManager : MonoBehaviour
     private void SetSavedDataUI(SavedData _savedData)
     {
         numberOfPlayersText.text = _savedData.players.ToString();
+        _savedData.spyes = CheckSpyDependsPlayer(_savedData.players,_savedData.spyes);
         numberOfSpyesText.text = _savedData.spyes.ToString();
         timeSelected.text = _savedData.time.ToString();
         subjectText.text = _savedData.packName;
 
-        onSetGame?.Invoke(currentSavedData);
+        onSetGame?.Invoke(_savedData);
+    }
+    private int CheckSpyDependsPlayer(int players,int spyes)
+    {
+        if (players < 5)
+            spyes = 1;
+        else if(players<10)
+        {
+            if (spyes > 2)
+                spyes = 2;
+        }
+        else if(players<15)
+        {
+            if (spyes > 3)
+                spyes = 3;
+        }
+        return spyes;
     }
     #region Button Manage
     public void NumberOfPlayersOn()
@@ -210,11 +225,16 @@ public class MenuManager : MonoBehaviour
     public void ConfirmedNumberSelection()
     {
         SetSavedDataUI(currentSavedData);
+        onSecondScreen?.Invoke(false);
+        StartCoroutine(ClearSecondScreen());
+    }
+    IEnumerator ClearSecondScreen()
+    {
+        yield return new WaitForSeconds(0.5f);
+
         playersScroolView.SetActive(false);
         spyesScroolView.SetActive(false);
         timeScroolView.SetActive(false);
-
-        onSecondScreen?.Invoke(false);
     }
     public void ConfirmedSubjectSelection()
     {
@@ -246,8 +266,9 @@ public class MenuManager : MonoBehaviour
     }
     IEnumerator ErrorLabelOff()
     {
-        yield return new WaitForSeconds(1.6f);
+        yield return new WaitForSeconds(2f);
         packEmptyError.SetActive(false);
+        
     }
     public void ThirdsScreenOff()
     {
@@ -257,8 +278,6 @@ public class MenuManager : MonoBehaviour
     public void ScreensOff()
     {
         onSecondScreen?.Invoke(false);
-        ThirdsScreenOff();
-        HowToPlayScreenOff();
     }
     #endregion
 

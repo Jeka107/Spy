@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System;
 using UnityEngine;
 using GoogleMobileAds.Api;
@@ -12,8 +10,7 @@ public class AdmobAdsScript : MonoBehaviour
     [Header("ANDROID")]
 #if UNITY_ANDROID
     [SerializeField] string bannerId = "";
-    [SerializeField] string interIdOnStartGame = "";
-    [SerializeField] string interIdOnStartTimer = "";
+    [SerializeField] string interId = "";
 
     [Header("IPHONE")]
 #elif UNITY_IPHONE
@@ -21,9 +18,24 @@ public class AdmobAdsScript : MonoBehaviour
    [SerializeField] string interId = "ca-app-pub-3940256099942544/4411468910";
 #endif
 
+    private static bool created = false;
     private BannerView _bannerView;
     private InterstitialAd _interstitialAd;
-
+    private AdRequest adRequest;
+    
+    private void Awake()
+    {
+        if (!created)
+        {
+            DontDestroyOnLoad(this.gameObject);
+            created = true;
+        }
+        GameManager.onGetAdmobAds += GetAdmobAds;
+    }
+    private void OnDestroy()
+    {
+        GameManager.onGetAdmobAds -= GetAdmobAds;
+    }
     public void Start()
     {
         // Initialize the Google Mobile Ads SDK.
@@ -31,7 +43,14 @@ public class AdmobAdsScript : MonoBehaviour
         {
             Debug.Log("MobileAds SDK is initialized.");        
         });
+        LoadInterstitialAd();
+        CreateBannerView();
     }
+    private AdmobAdsScript GetAdmobAds()
+    {
+        return this;
+    }
+
     #region Banner
     /// <summary>
     /// Creates a 320x50 banner view at top of the screen.
@@ -41,13 +60,17 @@ public class AdmobAdsScript : MonoBehaviour
         Debug.Log("Creating banner view");
 
         // If we already have a banner, destroy the old one.
-        if (_bannerView != null)
+        /*if (_bannerView != null)
         {
             DestroyBannerView();
-        }
+        }*/
 
-        // Create a 320x50 banner at top of the screen
-        _bannerView = new BannerView(bannerId, AdSize.Banner, adPosition);
+        if (_bannerView == null)
+            // Create a 320x50 banner at top of the screen
+            _bannerView = new BannerView(bannerId, AdSize.Banner, adPosition);
+
+        if(adRequest==null)
+            adRequest = new AdRequest();
     }
     /// <summary>
     /// Creates the banner view and loads a banner ad.
@@ -61,7 +84,7 @@ public class AdmobAdsScript : MonoBehaviour
         }
 
         // create our request used to load the ad.
-        var adRequest = new AdRequest();
+        //var adRequest = new AdRequest();
 
         // send the request to load the ad.
         Debug.Log("Loading banner ad.");
@@ -125,25 +148,13 @@ public class AdmobAdsScript : MonoBehaviour
         }
     }
     #endregion
-
+    
     #region Interstitial Ad
     /// <summary>
     /// Loads the interstitial ad.
     /// </summary>
-    public void LoadInterstitialAd(string start)
+    public void LoadInterstitialAd()
     {
-        string interId="";
-
-        if(start=="StartGame")
-        {
-            interId = interIdOnStartGame;
-        }
-        else if(start == "StartTimer")
-        {
-            interId = interIdOnStartTimer;
-        }
-
-
         // Clean up the old ad before loading a new one.
         if (_interstitialAd != null)
         {
@@ -183,6 +194,7 @@ public class AdmobAdsScript : MonoBehaviour
         {
             Debug.Log("Showing interstitial ad.");
             _interstitialAd.Show();
+            RegisterReloadHandler(_interstitialAd);
         }
         else
         {
@@ -225,7 +237,7 @@ public class AdmobAdsScript : MonoBehaviour
                            "with error : " + error);
         };
     }
-    /*private void RegisterReloadHandler(InterstitialAd interstitialAd)
+    private void RegisterReloadHandler(InterstitialAd interstitialAd)
     {
         // Raised when the ad closed full screen content.
         interstitialAd.OnAdFullScreenContentClosed += () =>
@@ -244,6 +256,6 @@ public class AdmobAdsScript : MonoBehaviour
             // Reload the ad so that we can show another as soon as possible.
             LoadInterstitialAd();
         };
-    }*/
+    }
     #endregion
 }

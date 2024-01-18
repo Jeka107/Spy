@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using CandyCoded.HapticFeedback;
 
 public class NameInPack : MonoBehaviour
 {
@@ -33,8 +34,12 @@ public class NameInPack : MonoBehaviour
     }
     public void ToggleChange()
     {
-        if(toggleStatus)
-            onToggleChange?.Invoke(pos,toggle.isOn);
+        if (toggleStatus)
+        {
+            onToggleChange?.Invoke(pos, toggle.isOn);
+            Debug.Log("Vibration");
+            HapticFeedback.LightFeedback();
+        }
     }
     public void DisableDelete()
     {

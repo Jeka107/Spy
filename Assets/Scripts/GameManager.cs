@@ -8,7 +8,10 @@ public class GameManager : MonoBehaviour
 {
     public delegate int OnGetTimer();
     public static event OnGetTimer onGetTimer;
+    public delegate AdmobAdsScript OnGetAdmobAds();
+    public static event OnGetAdmobAds onGetAdmobAds;
 
+    [SerializeField] private GameObject titleImage;
     [SerializeField] private GameObject explanation;
     [SerializeField] private float timer = 1;
     [SerializeField] private GameObject timerGameobject;
@@ -26,9 +29,11 @@ public class GameManager : MonoBehaviour
     {
         CardController.onFlipCard += SetExplanationText;
         CardsManager.onDeckEmpty += DeckEmpty;
+        admobAds = onGetAdmobAds?.Invoke();
 
         timerGameobject.SetActive(false);
         Spyes.SetActive(false);
+        titleImage.SetActive(false);
 
         if (FindObjectOfType<DataManager>() != null)
         {
@@ -38,7 +43,6 @@ public class GameManager : MonoBehaviour
 
         explanationText = explanation.GetComponent<TextMeshProUGUI>();
         SetExplanationText(EnumExplanation.TapCard);
-        admobAds.LoadInterstitialAd("StartTimer");
     }
     private void OnDestroy()
     {
@@ -78,8 +82,7 @@ public class GameManager : MonoBehaviour
     }
     public void BackToHome()
     {
-        admobAds.DestroyBannerView();
-        SceneManager.LoadScene("Menu");
+        SceneManager.LoadScene(0);
     }
     private void SetExplanationText(string explanation)
     {
@@ -90,6 +93,7 @@ public class GameManager : MonoBehaviour
     {
         explanationText.text = EnumExplanation.TimerOn;
         timerGameobject.SetActive(true);
+        titleImage.SetActive(true);
         spyesPlaces = cardsManager.spyesPlaces;
         timerStatus = true;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -98,9 +102,10 @@ public class GameManager : MonoBehaviour
     IEnumerator StartAds()
     {
         yield return new WaitForSeconds(1f);
-        admobAds.ShowInterstitialAd();
-        admobAds.LoadAd();
+        admobAds?.ShowInterstitialAd();
+        admobAds?.LoadAd();
     }
+
     void DisplayTime(float timeToDisplay)
     {
         timeToDisplay += 1;

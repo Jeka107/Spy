@@ -40,8 +40,8 @@ public class ScreenManager : MonoBehaviour
         MenuManager.onBlurOff -= BlurEffectOff;
     }
     private void SecondScreenAction(bool status)
-    { 
-        if(status)
+    {
+        if (status)
         {
             currentScreen = secondScreen;
             currentWayPoint = wayPoints[1];
@@ -94,13 +94,14 @@ public class ScreenManager : MonoBehaviour
         StartCoroutine(MoveScreens());
     }
     IEnumerator MoveScreens()
-    {
+    { 
         while (move)
         {
-            currentScreen.transform.localPosition = Vector2.MoveTowards(currentScreen.transform.localPosition,
-                currentWayPoint, speed * Time.deltaTime);
             if (currentScreen.transform.localPosition == currentWayPoint)
                 move = false;
+            currentScreen.transform.localPosition = Vector2.MoveTowards(currentScreen.transform.localPosition,
+                currentWayPoint, speed * Time.deltaTime);
+            
             yield return new WaitForEndOfFrame();
         }
     }

@@ -22,7 +22,7 @@ public static class EnumExplanation
     public const string
         TapCard = "הקש על הקלף",
         TapCardAgain = "הקש שוב על הקלף והעבר לשחקן הבא",
-        Spy = "אתה המרגל !"+ "\n\n" + "גלה את מילת המפתח מבלי שיחשפו אותך" + "\n\n"+ TapCardAgain,
-        TimerOn = "גלו מי המרגל לפני שהזמן נגמר";
+        Spy = "אתה המרגל !"+ "\n\n" + "גלה את מילת המפתח מבלי שיחשפו אותך" + "\n\n" + TapCardAgain,
+        TimerOn = "התחילו לשאול שאלות! \n\n גלו מי המרגל לפני שהזמן נגמר!";
 }
 
