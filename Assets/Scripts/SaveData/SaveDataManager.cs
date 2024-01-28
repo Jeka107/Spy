@@ -73,6 +73,7 @@ public class SaveDataManager : MonoBehaviour
         DefaultPack.onLoadPack += LoadListJson<PackData>;
 
         SnapToSlot.onNumberSnapedOnStartGame += GetSavedData;
+        SpyesSnapToSlot.onNumberSnapedOnStartGame += GetSavedData;
         MenuManager.onLoadSavedDataToUI += GetSavedData;
         MenuManager.onPackChange += SaveListJson;
         MenuManager.onSetGame += SaveData;
@@ -88,6 +89,7 @@ public class SaveDataManager : MonoBehaviour
         DefaultPack.onLoadPack -= LoadListJson<PackData>;
 
         SnapToSlot.onNumberSnapedOnStartGame -= GetSavedData;
+        SpyesSnapToSlot.onNumberSnapedOnStartGame -= GetSavedData;
         MenuManager.onLoadSavedDataToUI -= GetSavedData;
         MenuManager.onPackChange -= SaveListJson;
         MenuManager.onSetGame -= SaveData;

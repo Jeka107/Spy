@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
-using CandyCoded.HapticFeedback;
 
 public class MenuManager : MonoBehaviour
 {
@@ -86,7 +85,7 @@ public class MenuManager : MonoBehaviour
         NewPack.onSelectedCustomPack += CustomSubjectSelected;
         NewPack.onDefaultPack += StartPack;
         SnapToSlot.onSnapNumberOfPlayers += SetNumberOfPlayers;
-        SnapToSlot.onSnapNumberOfSpyes += SetNumberOfSpyes;
+        SpyesSnapToSlot.onSnapNumberOfSpyes += SetNumberOfSpyes;
         SnapToSlot.onSnapTime += SetTimeSelected;
         NameInPack.onToggleChange += ToggleChange;
         NameInPack.onDelete += ConfirmDeleteNameLabelOn;
@@ -109,7 +108,7 @@ public class MenuManager : MonoBehaviour
         NewPack.onSelectedCustomPack -= CustomSubjectSelected;
         NewPack.onDefaultPack -= StartPack;
         SnapToSlot.onSnapNumberOfPlayers -= SetNumberOfPlayers;
-        SnapToSlot.onSnapNumberOfSpyes -= SetNumberOfSpyes;
+        SpyesSnapToSlot.onSnapNumberOfSpyes -= SetNumberOfSpyes;
         SnapToSlot.onSnapTime -= SetTimeSelected;
         NameInPack.onToggleChange -= ToggleChange;
         NameInPack.onDelete -= ConfirmDeleteNameLabelOn;
@@ -154,13 +153,15 @@ public class MenuManager : MonoBehaviour
     private int CheckSpyDependsPlayer(int players,int spyes)
     {
         if (players < 5)
+        {
             spyes = 1;
-        else if(players<10)
+        }
+        else if (players < 10)
         {
             if (spyes > 2)
                 spyes = 2;
         }
-        else if(players<15)
+        else if (players < 15)
         {
             if (spyes > 3)
                 spyes = 3;
@@ -172,24 +173,18 @@ public class MenuManager : MonoBehaviour
     {
         secondScreenTitle.text = EnumTitle.Players.ToString();
         playersScroolView.SetActive(true);
-        spyesScroolView.SetActive(false);
-        timeScroolView.SetActive(false);
         onSecondScreen?.Invoke(true);
     }
     public void NumberOfSpyesOn()
     {
         secondScreenTitle.text = EnumTitle.Spyes.ToString();
         spyesScroolView.SetActive(true);
-        playersScroolView.SetActive(false);
-        timeScroolView.SetActive(false);
         onSecondScreen?.Invoke(true);
     }
     public void TimeSelectOn()
     {
         secondScreenTitle.text = EnumTitle.Time.ToString();
         timeScroolView.SetActive(true);
-        spyesScroolView.SetActive(false);
-        playersScroolView.SetActive(false);
         onSecondScreen?.Invoke(true);
     }
     public void SubjectSelectionOn()
@@ -201,10 +196,6 @@ public class MenuManager : MonoBehaviour
     public void HowToPlayScreenOn()
     {
         onHowToPlayScreen?.Invoke(true);
-    }
-    private void HowToPlayScreenOff()
-    {
-        onHowToPlayScreen?.Invoke(false);
     }
     public void SubjectsOn()
     {
@@ -221,7 +212,6 @@ public class MenuManager : MonoBehaviour
         namesScroolView.SetActive(true);
         subjScroolView.SetActive(false);
     }
-
     public void ConfirmedNumberSelection()
     {
         SetSavedDataUI(currentSavedData);
@@ -230,7 +220,7 @@ public class MenuManager : MonoBehaviour
     }
     IEnumerator ClearSecondScreen()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
 
         playersScroolView.SetActive(false);
         spyesScroolView.SetActive(false);
@@ -273,11 +263,12 @@ public class MenuManager : MonoBehaviour
     public void ThirdsScreenOff()
     {
         onThirdScreen?.Invoke(false);
-        StartCoroutine(ClearThirdScreen(0.5f));
+        StartCoroutine(ClearThirdScreen(0.2f));
     }
     public void ScreensOff()
     {
         onSecondScreen?.Invoke(false);
+        StartCoroutine(ClearSecondScreen());
     }
     #endregion
 
