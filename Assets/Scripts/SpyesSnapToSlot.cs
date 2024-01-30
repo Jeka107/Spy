@@ -16,6 +16,7 @@ public class SpyesSnapToSlot : MonoBehaviour
     [SerializeField] private RectTransform sampleListSlot;
     [SerializeField] private HorizontalOrVerticalLayoutGroup HLG;
     [SerializeField] private float snapForce;
+    [SerializeField] private MenuManager menuManager;
 
     [Space]
     [Header("Spy Slots")]
@@ -26,7 +27,7 @@ public class SpyesSnapToSlot : MonoBehaviour
 
     private SavedData savedData;
     private int currentSlot = 0;
-    private bool isSnapped = false;
+    public bool isSnapped = false;
     private float snapSpeed;
 
     private void Awake()
@@ -52,13 +53,14 @@ public class SpyesSnapToSlot : MonoBehaviour
 
             if (contentPanel.localPosition.x == 0 - (currentSlot * (sampleListSlot.rect.width + HLG.spacing)))
             {
-                isSnapped = true;
+                
                 NumberSnaped();
             }
         }
         if (scrollRect.velocity.magnitude > 200)
         {
             isSnapped = false;
+            menuManager.isSnaped = false;
             snapSpeed = 0;
         }
     }
@@ -73,6 +75,8 @@ public class SpyesSnapToSlot : MonoBehaviour
     {
         currentSlot += 1;
         onSnapNumberOfSpyes?.Invoke(currentSlot);
+        isSnapped = true;
+        menuManager.isSnaped = true;
     }
 
     public void SetMaxNumbersOfSpyes(int numberPlayers)
@@ -105,5 +109,14 @@ public class SpyesSnapToSlot : MonoBehaviour
             slot3.SetActive(true);
             slot4.SetActive(true);
         }
+    }
+    public void SetCurrentSlot(int slot)
+    {
+        currentSlot = slot-1;
+
+        int pos;
+        pos = Mathf.RoundToInt(0 - currentSlot * (sampleListSlot.rect.width + HLG.spacing));
+        contentPanel.localPosition = new Vector3(pos, contentPanel.localPosition.y,
+            contentPanel.localPosition.z);
     }
 }

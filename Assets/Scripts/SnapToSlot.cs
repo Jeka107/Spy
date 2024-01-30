@@ -20,16 +20,16 @@ public class SnapToSlot : MonoBehaviour
     [SerializeField] private HorizontalOrVerticalLayoutGroup HLG;
     [SerializeField] private float snapForce;
     [SerializeField] private SpyesSnapToSlot SpyesSnapToSlot;
+    [SerializeField] private MenuManager menuManager;
 
     private SavedData savedData;
     private int currentSlot = 0;
-    private bool isSnapped=false;
+    public bool isSnapped=false;
     private float snapSpeed;
 
     private void Awake()
     {
         savedData = onNumberSnapedOnStartGame?.Invoke();
-
         NumberSnapedOnStartGame();
     }
 
@@ -49,13 +49,13 @@ public class SnapToSlot : MonoBehaviour
 
             if (contentPanel.localPosition.x == 0 - (currentSlot * (sampleListSlot.rect.width + HLG.spacing)))
             {
-                isSnapped = true;
                 NumberSnaped();
             }
         }
         if(scrollRect.velocity.magnitude>200)
         {
             isSnapped = false;
+            menuManager.isSnaped = false;
             snapSpeed = 0;
         }
     }
@@ -88,5 +88,24 @@ public class SnapToSlot : MonoBehaviour
                 onSnapTime?.Invoke(currentSlot);
                 break;
         }
+        isSnapped = true;
+        menuManager.isSnaped = true;
+    }
+    public void SetCurrentSlot(int slot)
+    {
+        switch (scroolView)
+        {
+            case ScroolView.NumberOfPlayers:
+                currentSlot =slot-3;
+                break;
+            case ScroolView.Time:
+                currentSlot = slot - 1;
+                break;
+        }
+
+        int pos;
+        pos = Mathf.RoundToInt(0 - currentSlot * (sampleListSlot.rect.width + HLG.spacing));
+        contentPanel.localPosition = new Vector3(pos, contentPanel.localPosition.y,
+            contentPanel.localPosition.z);
     }
 }

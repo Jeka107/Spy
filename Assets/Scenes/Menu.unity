@@ -4325,10 +4325,12 @@ MonoBehaviour:
   sampleListSlot: {fileID: 941920286}
   HLG: {fileID: 1483665861}
   snapForce: 25
+  menuManager: {fileID: 939119713}
   slot1: {fileID: 941920285}
   slot2: {fileID: 1589245088}
   slot3: {fileID: 253922364}
   slot4: {fileID: 1498362909}
+  isSnapped: 0
 --- !u!1 &331558745
 GameObject:
   m_ObjectHideFlags: 0
@@ -13635,6 +13637,10 @@ MonoBehaviour:
   deletePackIcon: {fileID: 1648857707}
   confirmDeletePackLabel: {fileID: 434423436}
   confirmDeleteNameLabel: {fileID: 1602409248}
+  snapToSlotPlayerGO: {fileID: 6585497799448153356}
+  snapToSlotTimerGo: {fileID: 1065127114}
+  spyesSnapToSlot: {fileID: 330876993}
+  isSnaped: 0
 --- !u!4 &939119714
 Transform:
   m_ObjectHideFlags: 0
@@ -14018,7 +14024,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 175, y: -230}
+  m_AnchoredPosition: {x: 175, y: -260}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &949449053
@@ -16176,6 +16182,8 @@ MonoBehaviour:
   HLG: {fileID: 1708062034}
   snapForce: 100
   SpyesSnapToSlot: {fileID: 0}
+  menuManager: {fileID: 939119713}
+  isSnapped: 0
 --- !u!114 &1065127117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17770,7 +17778,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -260}
+  m_AnchoredPosition: {x: 0, y: -300}
   m_SizeDelta: {x: 300, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1278918408
@@ -29365,6 +29373,8 @@ MonoBehaviour:
   HLG: {fileID: 3622438205180640041}
   snapForce: 25
   SpyesSnapToSlot: {fileID: 330876993}
+  menuManager: {fileID: 939119713}
+  isSnapped: 0
 --- !u!114 &176111463536365785
 MonoBehaviour:
   m_ObjectHideFlags: 0

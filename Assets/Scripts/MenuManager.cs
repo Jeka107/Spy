@@ -60,6 +60,14 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject confirmDeletePackLabel;
     [SerializeField] private GameObject confirmDeleteNameLabel;
 
+    [Space]
+    [Header("SnapTools")]
+    [SerializeField] private GameObject snapToSlotPlayerGO;
+    [SerializeField] private GameObject snapToSlotTimerGo;
+    [SerializeField] private SpyesSnapToSlot spyesSnapToSlot;
+    private SnapToSlot snapToSlotPlayer;
+    private SnapToSlot snapToSlotTimer;
+
     private GameObject currentGameObject;
     private GameObject currentNameInPack;
     private GameObject namesScroolViewContent;
@@ -67,15 +75,23 @@ public class MenuManager : MonoBehaviour
     private string currentPackName;
     private ScrollRect scrollRectNamesScroolView;
     private int currentNameInPackPos;
-
+    
     private SavedData currentSavedData=new SavedData();
+    private int players;
+    private int spyes;
+    private int time;
+
+    private string numberbelongs;
     private Image blurImage;
+    public bool isSnaped = false;
 
     private void Awake()
     {
         namesScroolView.SetActive(false);
         scrollRectNamesScroolView = namesScroolView.GetComponent<ScrollRect>();
         blurImage = blur.GetComponent<Image>();
+        snapToSlotPlayer = snapToSlotPlayerGO.GetComponent<SnapToSlot>();
+        snapToSlotTimer = snapToSlotTimerGo.GetComponent<SnapToSlot>();
 
         //first time playing
         SaveDataManager.onFirstTimePack += SetFirstTimeGame;
@@ -172,26 +188,28 @@ public class MenuManager : MonoBehaviour
     public void NumberOfPlayersOn()
     {
         secondScreenTitle.text = EnumTitle.Players.ToString();
+        numberbelongs= EnumTitle.Players.ToString();
         playersScroolView.SetActive(true);
         onSecondScreen?.Invoke(true);
     }
     public void NumberOfSpyesOn()
     {
         secondScreenTitle.text = EnumTitle.Spyes.ToString();
+        numberbelongs = EnumTitle.Spyes.ToString();
         spyesScroolView.SetActive(true);
         onSecondScreen?.Invoke(true);
     }
     public void TimeSelectOn()
     {
         secondScreenTitle.text = EnumTitle.Time.ToString();
+        numberbelongs = EnumTitle.Time.ToString();
         timeScroolView.SetActive(true);
         onSecondScreen?.Invoke(true);
     }
     public void SubjectSelectionOn()
     {
         deletePackIcon.SetActive(false);
-        StartCoroutine(ClearThirdScreen(0f));
-        
+        StartCoroutine(ClearThirdScreen(0f));  
     }
     public void HowToPlayScreenOn()
     {
@@ -214,9 +232,25 @@ public class MenuManager : MonoBehaviour
     }
     public void ConfirmedNumberSelection()
     {
-        SetSavedDataUI(currentSavedData);
-        onSecondScreen?.Invoke(false);
-        StartCoroutine(ClearSecondScreen());
+        if (snapToSlotPlayer.isSnapped|| snapToSlotTimer.isSnapped || spyesSnapToSlot.isSnapped)
+        {
+            switch(numberbelongs)
+            {
+                case EnumTitle.Players:
+                    currentSavedData.players = players;
+                    break;
+                case EnumTitle.Spyes:
+                    currentSavedData.spyes = spyes;
+                    break;
+                case EnumTitle.Time:
+                    currentSavedData.time = time;
+                    break;
+            }
+
+            SetSavedDataUI(currentSavedData);
+            onSecondScreen?.Invoke(false);
+            StartCoroutine(ClearSecondScreen());
+        }
     }
     IEnumerator ClearSecondScreen()
     {
@@ -267,6 +301,11 @@ public class MenuManager : MonoBehaviour
     }
     public void ScreensOff()
     {
+        snapToSlotPlayer.SetCurrentSlot(currentSavedData.players);
+        snapToSlotTimer.SetCurrentSlot(currentSavedData.time);
+        spyesSnapToSlot.SetCurrentSlot(currentSavedData.spyes);
+
+
         onSecondScreen?.Invoke(false);
         StartCoroutine(ClearSecondScreen());
     }
@@ -347,15 +386,15 @@ public class MenuManager : MonoBehaviour
 
     private void SetNumberOfPlayers(int num)
     {
-        currentSavedData.players = num;
+        players = num;
     }
     private void SetNumberOfSpyes(int num)
     {
-        currentSavedData.spyes = num;
+        spyes = num;
     }
     private void SetTimeSelected(int num)
     {
-        currentSavedData.time = num;
+        time = num;
     }
 
     IEnumerator ClearThirdScreen(float waitForSeconds)
